@@ -1,0 +1,7 @@
+node_modules
+dist
+playwright-report
+test-results
+.DS_Store
+descricao_entrega.txt
+layount_do_fihma.png
