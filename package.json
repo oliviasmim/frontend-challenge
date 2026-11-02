@@ -1,0 +1,14 @@
+{
+  "name": "kurio-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm run dev:mocks -w @kurio/web",
+    "build": "npm run build -w @kurio/web",
+    "preview": "npm run preview -w @kurio/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:e2e": "npm run test:e2e -w @kurio/web",
+    "validate:specs": "openspec validate --all"
+  }
+}
