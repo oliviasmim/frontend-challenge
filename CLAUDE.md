@@ -1,0 +1,60 @@
+# CLAUDE.md: Desafio Frontend (Marketplace de NFTs)
+
+O `README.md` é o enunciado e faz o papel do dono do negócio. Ainda não existe código.
+Uma feature mexe em UM bounded context só; se precisar de outro, pare e pergunte.
+
+# Glossário: Marketplace de NFTs (Desafio Frontend)
+
+Fonte única: o `README.md` deste repositório (o enunciado). Cada termo aponta a seção de onde saiu.
+O código ainda não existe; as pastas abaixo são onde cada contexto **deve** morar.
+
+## Contexto 1: Catálogo (pasta: `src/catalogo/`)
+
+Descobrir NFTs: início, busca, filtros, ordenação, paginação e detalhe. Só lê; não compra nada.
+
+- **NFT**: item colecionável listado no catálogo, com identificador próprio, galeria e
+  informações. Pode ser aberto por acesso direto ou não existir. (§3 "Detalhes do NFT",
+  §3 "Catálogo e detalhe", §5 "NFTs")
+- **Edição**: uma tiragem de um NFT, com quantidade disponível própria. Pode estar
+  indisponível ou esgotada, e a quantidade escolhida tem limite. (§3 "edição indisponível e limite
+  de quantidade", §3 Carrinho "disponibilidade por NFT e edição", §6 "edição esgotada")
+- **Filtro**: critério combinável que restringe o catálogo. Junto com busca, ordenação e
+  página, faz parte do estado da URL, e mudar um filtro volta para a primeira página.
+  (§3 "Catálogo e detalhe")
+
+## Contexto 2: Compra (pasta: `src/compra/`)
+
+Do carrinho ao recibo: carrinho, cupom, cotação, pagamento, pedido e confirmação.
+
+- **Carrinho**: as edições e as quantidades (sempre inteiras) que o colecionador pretende
+  comprar. Sobrevive a refresh e é preservado quando o visitante faz login. (§3 "Carrinho", §3 "Valores
+  em ETH... Quantidades são inteiras")
+- **Cotação**: a resposta da API que valida cupom e disponibilidade e calcula desconto, taxa de
+  rede e total. É **a referência para finalizar o pedido**. Se estiver desatualizada, não pode
+  confirmar a compra. (§3 Carrinho, §5 "Cotação", §7 cenário, passo 4)
+- **Pedido**: a compra enviada com uma chave de idempotência. Começa **pendente** e termina
+  **confirmado** ou **recusado**, que são estados terminais. A mesma tentativa recupera o mesmo pedido.
+  (§3 "Pagamento e confirmação", §5 "Pedidos", §7)
+
+## Palavra que muda de sentido entre os dois
+
+- **Preço**:
+  - no **Catálogo**, é o preço **vigente** da edição, um valor vivo que muda a qualquer momento
+    pelo evento `nft.updated` ("Atualizar preço e disponibilidade no catálogo, detalhe e
+    carrinho", §7);
+  - na **Compra**, é o preço **cotado**, o valor que a cotação fixou e que o pedido usa. Depois
+    da confirmação, ele fica congelado no recibo: "O recibo deve reproduzir o snapshot do pedido.
+    Alterações posteriores no catálogo não podem modificar seus valores." (§3)
+  - Por isso a seção 7 exige que "o checkout impede a confirmação com uma cotação desatualizada":
+    quando o preço do Catálogo muda, o preço da Compra fica velho.
+
+## Termo compartilhado (mesmo sentido nos dois)
+
+- **Colecionador**: a pessoa que navega e compra. Antes de fazer login, é **visitante**. (§1, §3
+  "Carrinho", "Perfil do colecionador")
+
+## Núcleo do meu projeto
+
+Comprar NFT com preço que muda em tempo real **sem pagar um valor diferente do que confirmou**:
+o colecionador vê a mudança, revê a cotação e só então confirma. Nunca é cobrado duas vezes nem
+perde o carrinho numa falha (§3 "Pagamento e confirmação", §7).
